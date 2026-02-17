@@ -12,7 +12,7 @@ function UserProfile() {
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
-
+console.log('user profile rendered' , user);
   const token = localStorage.getItem("token");
 
   /* ================= FETCH PROFILE ================= */

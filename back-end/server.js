@@ -42,6 +42,9 @@ app.use(cors({
   credentials: true,
 }));
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
 // -------------------- ROUTES --------------------
 app.use('/api', routes);
 app.get('/', (req, res) => res.send('Server running!'));
