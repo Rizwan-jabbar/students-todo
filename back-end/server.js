@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import connectDB from './config/db.js';
 import cors from 'cors';
-import routes from './routes/routes.js'; // your todo API routes
+import routes from './routes/routes.js';
 import serverless from 'serverless-http';
 
 const app = express();
@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 3000;
     console.log('✅ Database connected');
   } catch (err) {
     console.error('❌ Database connection failed:', err);
-    process.exit(1); // stop server if DB fails
+    process.exit(1);
   }
 })();
 
@@ -27,24 +27,23 @@ app.use(express.urlencoded({ extended: true }));
 // -------------------- CORS --------------------
 app.use(cors({
   origin: [
-    'http://localhost:3000',                // local React
-    'http://127.0.0.1:5173',                // Vite dev server
-    'https://students-todo.vercel.app'      // production frontend
+    'http://localhost:3000',
+    'http://127.0.0.1:5173',
+    'https://students-todo.vercel.app'
   ],
   methods: ['GET','POST','PUT','DELETE','OPTIONS'],
   allowedHeaders: ['Content-Type','Authorization'],
 }));
 
-// -------------------- API ROUTES --------------------
+// -------------------- ROUTES --------------------
 app.use('/api', routes);
-
-// -------------------- TEST ROUTE --------------------
 app.get('/', (req, res) => res.send('Server running!'));
 
 // -------------------- SERVERLESS EXPORT --------------------
-if (process.env.NODE_ENV === 'production') {
-  export default serverless(app);
-} else {
-  // -------------------- LOCAL DEVELOPMENT --------------------
-  app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+export default serverless(app);
+
+// -------------------- LOCAL DEV SERVER --------------------
+if (process.env.NODE_ENV !== 'production') {
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => console.log(`Server listening on port ${port}`));
 }
