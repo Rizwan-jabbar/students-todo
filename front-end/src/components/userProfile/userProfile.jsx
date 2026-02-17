@@ -109,6 +109,9 @@ console.log('user profile rendered' , user);
     ? `https://students-todo-production.up.railway.app/uploads/${user.profileImage}`
     : null;
 
+    console.log("Image URL:", `https://students-todo-production.up.railway.app/uploads/${user.profileImage}`);
+
+
   return (
     <section className="px-4 py-8 flex justify-center">
       <div className="w-full max-w-xl">
