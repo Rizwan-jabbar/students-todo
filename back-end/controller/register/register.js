@@ -20,13 +20,12 @@ export const register = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password.trim(), 10);
 
-        const newUser = new User({
-            name: name.trim(),
-            email: email.trim().toLowerCase(),
-            password: hashedPassword,
-            profileImage: req.file ? req.file.filename : null
-        });
-
+       const newUser = new User({
+    name: name.trim(),
+    email: email.trim().toLowerCase(),
+    password: hashedPassword,
+    profileImage: req.file ? req.file.path : null
+});
         console.log('user registered successfully : ', newUser)
 
         await newUser.save();
