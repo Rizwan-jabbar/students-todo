@@ -1,13 +1,12 @@
+// server.js
 import express from 'express';
 import dotenv from 'dotenv';
 dotenv.config();
 import connectDB from './config/db.js';
 import cors from 'cors';
 import routes from './routes/routes.js';
-import serverless from 'serverless-http';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // -------------------- DATABASE CONNECTION --------------------
 (async () => {
@@ -16,7 +15,7 @@ const PORT = process.env.PORT || 3000;
     console.log('✅ Database connected');
   } catch (err) {
     console.error('❌ Database connection failed:', err);
-    process.exit(1);
+    process.exit(1); // stop server if DB fails
   }
 })();
 
@@ -25,7 +24,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // -------------------- CORS --------------------
-
 const allowedOrigins = [
   'http://localhost:3000',                // local dev
   'http://127.0.0.1:5173',                // Vite dev server
@@ -34,32 +32,22 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // allow requests like Postman / server-to-server
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.log('Blocked CORS request from origin:', origin);
-      callback(new Error('Not allowed by CORS'));
-    }
+    if (!origin) return callback(null, true); // Postman / server-to-server requests
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    console.log('Blocked CORS request from origin:', origin);
+    callback(new Error('Not allowed by CORS'));
   },
   methods: ['GET','POST','PUT','DELETE','OPTIONS'],
   allowedHeaders: ['Content-Type','Authorization'],
-  credentials: true,  // optional if you send cookies
+  credentials: true,
 }));
-
-
 
 // -------------------- ROUTES --------------------
 app.use('/api', routes);
 app.get('/', (req, res) => res.send('Server running!'));
 
-// -------------------- SERVERLESS EXPORT --------------------
-export default serverless(app);
-
-// -------------------- LOCAL DEV SERVER --------------------
-if (process.env.NODE_ENV !== 'production') {
-  const port = process.env.PORT || 3000;
-  app.listen(port, () => console.log(`Server listening on port ${port}`));
-}
+// -------------------- START SERVER --------------------
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
