@@ -1,3 +1,4 @@
+import { Router } from "react-router-dom";
 import AppRoutes from "./appRoutes";
 
 function App () {
@@ -5,7 +6,10 @@ function App () {
     <>
 
   
+  <Router>
+
   <AppRoutes/>
+  </Router>
     
     </>
   )
