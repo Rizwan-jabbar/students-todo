@@ -13,7 +13,7 @@ const app = express();
 app.use(cors({
   origin: [
     'http://localhost:3000',                     // local dev
-    'https://ecommerce-mern-i4qd.vercel.app'    // deployed frontend
+    'https://students-todo.vercel.app'    // deployed frontend
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
