@@ -137,7 +137,7 @@ function Header() {
                 >
                   {user.profileImage ? (
                     <img
-                      src={`https://students-todo-production.up.railway.app/uploads/${user.profileImage}`}
+                      src={`${user.profileImage}`}
                       alt={user.name}
                       className="h-full w-full object-cover"
                     />
