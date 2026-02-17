@@ -31,6 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 // -------------------- SERVE UPLOADS --------------------
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+
 // -------------------- CORS --------------------
 const allowedOrigins = [
   'http://localhost:3000',                // local dev
