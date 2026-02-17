@@ -7,8 +7,16 @@ import cors from 'cors';
 import routes from './routes/routes.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { v2 as cloudinary} from 'cloudinary'
 
 const app = express();
+
+
+cloudinary.config({
+  cloud_name : process.env.CLOUDINARY_CLOUD_NAME,
+  API_key : process.env.CLOUDINARY_API_KEY,
+  API_secret : process.env.CLOUDINARY_API_SECRET
+})
 
 // Fix for __dirname in ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -50,6 +58,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type','Authorization'],
   credentials: true,
 }));
+
+
 
 
 
