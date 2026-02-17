@@ -72,3 +72,57 @@ export const deleteTodo = async (req, res) => {
     return res.status(500).json({ isSuccess: false, message: 'Server error' });
   }
 };
+
+
+export const updateTodo = async (req, res) => {
+  try {
+    const taskId = req.params.id;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        isSuccess: false,
+        message: "Unauthorized user",
+      });
+    }
+
+    if (!taskId) {
+      return res.status(400).json({
+        isSuccess: false,
+        message: "Task ID is required",
+      });
+    }
+
+    // Check if task belongs to user
+    const task = await Task.findOne({ _id: taskId, userId });
+
+    if (!task) {
+      return res.status(404).json({
+        isSuccess: false,
+        message: "Task not found",
+      });
+    }
+
+    // Only allow specific fields to update (security best practice)
+    const { title, description, completed } = req.body;
+
+    if (title !== undefined) task.title = title;
+    if (description !== undefined) task.description = description;
+    if (completed !== undefined) task.completed = completed;
+
+    const updatedTask = await task.save();
+
+    return res.status(200).json({
+      isSuccess: true,
+      message: "Task updated successfully",
+      task: updatedTask,
+    });
+
+  } catch (error) {
+    console.error("Update task error:", error);
+    return res.status(500).json({
+      isSuccess: false,
+      message: "Server error",
+    });
+  }
+};

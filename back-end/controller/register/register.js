@@ -3,7 +3,7 @@ import User from '../../models/userSchema/userSchema.js';
 
 export const register = async (req, res) => {
     try {
-        const { name ,  email, password } = req.body;
+        const { name, email, password } = req.body;
 
         if (!name || !email || !password) {
             return res.status(400).send({ isSuccess: false, message: 'Name, email and password are required' });
@@ -23,10 +23,11 @@ export const register = async (req, res) => {
         const newUser = new User({
             name: name.trim(),
             email: email.trim().toLowerCase(),
-            password: hashedPassword
+            password: hashedPassword,
+            profileImage: req.file ? req.file.filename : null
         });
 
-        console.log('user registered successfully : ' , newUser)
+        console.log('user registered successfully : ', newUser)
 
         await newUser.save();
 
@@ -37,18 +38,18 @@ export const register = async (req, res) => {
     }
 };
 
-export const getRegisteredUsers = async (req , res) => {
+export const getRegisteredUsers = async (req, res) => {
     try {
-        
+
         const registeredUsers = await User.find()
 
         return res.status(200).json({
-            message : 'users  fetched susseccfully',
-            users : registeredUsers
+            message: 'users  fetched susseccfully',
+            users: registeredUsers
         })
 
     } catch (error) {
-        
+
     }
 }
 

@@ -1,32 +1,25 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FaPlus, FaTrash, FaCheck } from "react-icons/fa";
-import { motion } from "framer-motion";
+import { FaPlus, FaTrash, FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
 
 function AddToDo() {
   const { t } = useTranslation();
 
-  const [form, setForm] = useState({
-    task: "",
-    description: "",
-    tasks: [],
-  });
-
+  const [task, setTask] = useState("");
+  const [description, setDescription] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
+  const maxDescLength = 150;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    if (form.task.trim() === "") {
+    if (!task.trim()) {
       setError(t("add_todo.messages.empty_task_error"));
       return;
     }
@@ -46,156 +39,145 @@ function AddToDo() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          title: form.task,
-          description: form.description,
-        }),
+        body: JSON.stringify({ title: task, description }),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || t("add_todo.messages.server_error"));
-
-      const newTask = {
-        id: data.task._id,
-        text: data.task.title,
-        description: data.task.description,
-        addedTime: new Date(data.task.createdAt).getTime(),
-      };
-
-      setForm((prev) => ({
-        task: "",
-        description: "",
-        tasks: [...prev.tasks, newTask],
-      }));
+      if (!res.ok) throw new Error(data.message);
 
       setSuccess(t("add_todo.messages.success_title"));
+
+      // Auto clear after success
+      setTimeout(() => {
+        setTask("");
+        setDescription("");
+        setSuccess("");
+      }, 1500);
+
     } catch (err) {
-      console.error(err);
-      setError(err?.message || t("add_todo.messages.server_error"));
+      setError(err.message || t("add_todo.messages.server_error"));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section className="px-4 py-8 flex justify-center">
-      <div className="w-full max-w-xl">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="rounded-2xl bg-white border border-gray-200 shadow-lg overflow-hidden"
-        >
-          <div className="p-6 border-b border-gray-100 flex items-start justify-between gap-4">
-            <div>
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900">
-                {t("add_todo.title_section")}
-              </h2>
-              <p className="mt-1 text-sm text-gray-500">
-                {t("add_todo.subtitle_section")}
-              </p>
+    <div className="h-full flex flex-col">
+      <motion.div
+        initial={{ opacity: 0, y: -15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="bg-white/70 backdrop-blur-xl border border-gray-200 shadow-xl rounded-3xl p-8 h-full flex flex-col"
+      >
+        {/* Header */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-800">
+            {t("add_todo.title_section")}
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">
+            {t("add_todo.subtitle_section")}
+          </p>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5 flex-1">
+
+          {/* Task Input */}
+          <div>
+            <label className="text-sm font-semibold text-gray-700">
+              {t("add_todo.form.title_label")}
+            </label>
+
+            <input
+              type="text"
+              value={task}
+              onChange={(e) => setTask(e.target.value)}
+              placeholder={t("add_todo.form.title_placeholder")}
+              className="mt-2 w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900 transition"
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="text-sm font-semibold text-gray-700">
+              {t("add_todo.form.description_label")}
+            </label>
+
+            <textarea
+              rows="3"
+              value={description}
+              maxLength={maxDescLength}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder={t("add_todo.form.description_placeholder")}
+              className="mt-2 w-full resize-none rounded-2xl border border-gray-200 px-4 py-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900 transition"
+            />
+
+            <div className="text-xs text-gray-400 mt-1 text-right">
+              {description.length}/{maxDescLength}
             </div>
-
-            <span className="shrink-0 inline-flex items-center rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700 ring-1 ring-inset ring-green-200">
-              {t("add_todo.create_tag")}
-            </span>
           </div>
 
-          <div className="p-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label
-                  htmlFor="task"
-                  className="block text-sm font-semibold text-gray-800"
-                >
-                  {t("add_todo.form.title_label")} <span className="text-red-500">{t("add_todo.form.title_required")}</span>
-                </label>
-                <input
-                  id="task"
-                  name="task"
-                  value={form.task}
-                  onChange={handleChange}
-                  placeholder={t("add_todo.form.title_placeholder")}
-                  type="text"
-                  className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500 transition"
-                />
-                <p className="mt-2 text-xs text-gray-400">
-                  {t("add_todo.form.title_helper")}
-                </p>
-              </div>
+          {/* Alerts */}
+          <AnimatePresence>
+            {(error || success) && (
+              <motion.div
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className={`rounded-2xl px-4 py-3 text-sm flex items-start gap-3 ${
+                  error
+                    ? "bg-red-50 text-red-700 border border-red-200"
+                    : "bg-green-50 text-green-700 border border-green-200"
+                }`}
+              >
+                {error ? (
+                  <FaExclamationCircle className="mt-1" />
+                ) : (
+                  <FaCheckCircle className="mt-1" />
+                )}
+                <span>{error || success}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-              <div>
-                <label
-                  htmlFor="description"
-                  className="block text-sm font-semibold text-gray-800"
-                >
-                  {t("add_todo.form.description_label")} <span className="text-gray-400">{t("add_todo.form.description_optional")}</span>
-                </label>
-                <input
-                  id="description"
-                  name="description"
-                  value={form.description}
-                  onChange={handleChange}
-                  placeholder={t("add_todo.form.description_placeholder")}
-                  type="text"
-                  className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500 transition"
-                />
-              </div>
+          {/* Buttons */}
+          <div className="flex gap-4 mt-auto">
+            <motion.button
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              type="submit"
+              disabled={loading}
+              className="flex-1 bg-gray-900 text-white rounded-2xl py-3 text-sm font-semibold shadow-md hover:bg-gray-800 transition disabled:opacity-60"
+            >
+              {loading
+                ? t("add_todo.buttons.loading")
+                : (
+                  <span className="flex justify-center items-center gap-2">
+                    <FaPlus /> {t("add_todo.buttons.submit")}
+                  </span>
+                )}
+            </motion.button>
 
-              {(error || success) && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                  className={[
-                    "rounded-xl border p-4 text-sm",
-                    error
-                      ? "border-red-200 bg-red-50 text-red-700"
-                      : "border-green-200 bg-green-50 text-green-700",
-                  ].join(" ")}
-                >
-                  <p className="font-semibold flex items-center gap-2">
-                    {error ? <FaTrash /> : <FaCheck />} {error ? t("add_todo.messages.error_title") : t("add_todo.messages.success_title")}
-                  </p>
-                  <p className="mt-1">{error || success}</p>
-                </motion.div>
-              )}
-
-              <div className="flex items-center gap-3">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  type="submit"
-                  disabled={loading}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl whitespace-nowrap bg-green-600 px-5 py-3 text-sm font-semibold text-white hover:bg-green-700 active:bg-green-800 disabled:opacity-60 disabled:cursor-not-allowed transition focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500/40"
-                >
-                  <FaPlus />
-                  {loading ? t("add_todo.buttons.loading") : t("add_todo.buttons.submit")}
-                </motion.button>
-
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  type="button"
-                  onClick={() => {
-                    setError("");
-                    setSuccess("");
-                    setForm((prev) => ({ ...prev, task: "", description: "" }));
-                  }}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-800 hover:bg-gray-50 active:bg-gray-100 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500/20"
-                >
-                  <FaTrash /> {t("add_todo.buttons.clear")}
-                </motion.button>
-              </div>
-            </form>
-
-            <p className="mt-5 text-xs text-gray-400">
-              {t("add_todo.note")}
-            </p>
+            <motion.button
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              type="button"
+              onClick={() => {
+                setTask("");
+                setDescription("");
+                setError("");
+                setSuccess("");
+              }}
+              className="flex-1 border border-gray-300 bg-white rounded-2xl py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
+            >
+              <span className="flex justify-center items-center gap-2">
+                <FaTrash /> {t("add_todo.buttons.clear")}
+              </span>
+            </motion.button>
           </div>
-        </motion.div>
-      </div>
-    </section>
+        </form>
+      </motion.div>
+    </div>
   );
 }
 

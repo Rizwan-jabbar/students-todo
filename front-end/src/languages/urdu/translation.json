@@ -66,9 +66,10 @@
     "language": "زبان",
     "english": "انگریزی",
     "urdu": "اردو",
-    "logout": "لاگ آؤٹ"
-  }
-,
+    "logout": "لاگ آؤٹ",
+    "my_account": "میرا اکاؤنٹ",
+    "user_name": "صارف کا نام"
+  },
 
 
   "dashboard": {

@@ -1,30 +1,41 @@
 import { useEffect, useRef, useState } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FaTimes, FaSignOutAlt, FaGlobe, FaChevronDown } from "react-icons/fa";
-import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
+import { NavLink } from "react-router-dom";
 
 function Header() {
   const [showMenu, setShowMenu] = useState(false);
   const [showLang, setShowLang] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [user, setUser] = useState(null);
 
   const hamburgerRef = useRef(null);
-  const menuRef = useRef(null);
   const langRef = useRef(null);
+  const userRef = useRef(null);
 
   const { t, i18n } = useTranslation();
+  const token = localStorage.getItem("token");
 
+  /* ===================== FETCH USER ===================== */
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) setUser(storedUser);
+  }, []);
+
+  /* ===================== LANGUAGE ===================== */
   useEffect(() => {
     const savedLang = localStorage.getItem("lang") || "en";
     i18n.changeLanguage(savedLang);
     document.documentElement.dir = savedLang === "ur" ? "rtl" : "ltr";
   }, [i18n]);
 
+  /* ===================== CLICK OUTSIDE ===================== */
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (langRef.current && !langRef.current.contains(e.target)) {
-        setShowLang(false);
-      }
+      if (langRef.current && !langRef.current.contains(e.target)) setShowLang(false);
+      if (userRef.current && !userRef.current.contains(e.target)) setShowUserDropdown(false);
     };
     window.addEventListener("mousedown", handleClickOutside);
     return () => window.removeEventListener("mousedown", handleClickOutside);
@@ -52,11 +63,12 @@ function Header() {
     </li>
   );
 
+  const isRTL = i18n.language === "ur";
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
       <div className="mx-auto max-w-7xl px-4">
         <div className="flex h-16 items-center justify-between">
-
           {/* BRAND */}
           <motion.p
             initial={{ opacity: 0, x: -20 }}
@@ -90,11 +102,13 @@ function Header() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-2 w-36 rounded-xl border bg-white shadow-lg overflow-hidden z-50"
+                    className={`absolute top-full mt-2 w-36 rounded-xl border bg-white shadow-lg overflow-hidden z-50 ${
+                      isRTL ? "left-0" : "right-0"
+                    }`}
                   >
                     <button
                       onClick={() => changeLanguage("ur")}
-                      className={`w-full px-4 py-2 text-right hover:bg-gray-100 ${
+                      className={`w-full px-4 py-2 text-${isRTL ? "right" : "left"} hover:bg-gray-100 ${
                         i18n.language === "ur" && "bg-gray-100 font-semibold"
                       }`}
                     >
@@ -102,7 +116,7 @@ function Header() {
                     </button>
                     <button
                       onClick={() => changeLanguage("en")}
-                      className={`w-full px-4 py-2 text-left hover:bg-gray-100 ${
+                      className={`w-full px-4 py-2 text-${isRTL ? "right" : "left"} hover:bg-gray-100 ${
                         i18n.language === "en" && "bg-gray-100 font-semibold"
                       }`}
                     >
@@ -113,17 +127,58 @@ function Header() {
               </AnimatePresence>
             </div>
 
-            {/* LOGOUT */}
-            <button
-              onClick={handleLogout}
-              className="inline-flex items-center gap-2 text-red-600 font-semibold"
-            >
-              <FaSignOutAlt /> {t("header.logout")}
-            </button>
+            {/* USER PROFILE DROPDOWN DESKTOP */}
+            {user && (
+              <div ref={userRef} className="relative">
+                <button
+                  onClick={() => setShowUserDropdown((s) => !s)}
+                  className="h-10 w-10 rounded-full overflow-hidden border-2 border-gray-300 flex items-center justify-center cursor-pointer"
+                >
+                  {user.profileImage ? (
+                    <img
+                      src={`http://localhost:3000/uploads/${user.profileImage}`}
+                      alt={user.name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span className="bg-green-500 text-white font-bold">
+                      {user.name[0].toUpperCase() || "U"}
+                    </span>
+                  )}
+                </button>
+
+                <AnimatePresence>
+                  {showUserDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className={`absolute top-full mt-2 w-48 rounded-xl border bg-white shadow-lg overflow-hidden z-50 ${
+                        isRTL ? "left-0" : "right-0"
+                      }`}
+                    >
+                      <div className="px-4 py-2 border-b text-sm text-gray-700 font-semibold truncate">
+                        {user.name}
+                      </div>
+                      <NavLink to='/myProfile' className="w-full text-left overflow-hidden px-4 py-2 hover:bg-gray-100 text-sm">
+                        {t("header.my_account")}
+                      </NavLink>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm text-red-600 font-semibold flex items-center gap-2"
+                      >
+                        <FaSignOutAlt /> {t("header.logout")}
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
           </nav>
 
           {/* MOBILE HAMBURGER */}
-          <div ref={hamburgerRef} className="lg:hidden">
+          <div className="lg:hidden">
             <button
               onClick={() => setShowMenu(true)}
               className="p-2 border rounded-xl hover:bg-gray-100 transition"
@@ -148,7 +203,7 @@ function Header() {
               animate={{ x: 0 }}
               exit={{ x: 300 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="h-full w-72 bg-white p-4"
+              className={`h-full w-72 bg-white p-4 ${isRTL ? "rtl" : "ltr"}`}
             >
               <div className="flex justify-between items-center mb-4">
                 <p className="font-bold">{t("header.menu")}</p>
@@ -157,7 +212,7 @@ function Header() {
                 </button>
               </div>
 
-              <ul ref={menuRef} className="space-y-2">
+              <ul className="space-y-2">
                 <NavItem>{t("header.nav.home")}</NavItem>
                 <NavItem>{t("header.nav.todos")}</NavItem>
 
@@ -166,7 +221,7 @@ function Header() {
                   <p className="text-xs text-gray-500 mb-2">{t("header.language")}</p>
                   <button
                     onClick={() => changeLanguage("ur")}
-                    className={`w-full px-3 py-2 rounded text-right hover:bg-gray-100 ${
+                    className={`w-full px-3 py-2 rounded text-${isRTL ? "right" : "left"} hover:bg-gray-100 ${
                       i18n.language === "ur" && "bg-gray-100 font-semibold"
                     }`}
                   >
@@ -174,7 +229,7 @@ function Header() {
                   </button>
                   <button
                     onClick={() => changeLanguage("en")}
-                    className={`w-full px-3 py-2 rounded text-left hover:bg-gray-100 ${
+                    className={`w-full px-3 py-2 rounded text-${isRTL ? "right" : "left"} hover:bg-gray-100 ${
                       i18n.language === "en" && "bg-gray-100 font-semibold"
                     }`}
                   >
@@ -182,15 +237,36 @@ function Header() {
                   </button>
                 </li>
 
-                {/* LOGOUT */}
-                <li className="pt-4 border-t">
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-2 text-red-600 font-semibold"
-                  >
-                    <FaSignOutAlt /> {t("header.logout")}
-                  </button>
-                </li>
+                {/* USER PROFILE MOBILE */}
+                {user && (
+                  <li className="pt-4 border-t">
+                    <div className="flex items-center gap-3 px-3 py-2">
+                      <div className="h-10 w-10 rounded-full overflow-hidden border-2 border-gray-300 flex items-center justify-center">
+                        {user.profileImage ? (
+                          <img
+                            src={`http://localhost:3000/uploads/${user.profileImage}`}
+                            alt={user.name}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <span className="bg-green-500 text-white font-bold">
+                            {user.name[0].toUpperCase() || "U"}
+                          </span>
+                        )}
+                      </div>
+                      <span className="font-semibold text-gray-700 truncate">{user.name}</span>
+                    </div>
+                    <button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">
+                      {t("header.my_account")}
+                    </button>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm text-red-600 font-semibold flex items-center gap-2"
+                    >
+                      <FaSignOutAlt /> {t("header.logout")}
+                    </button>
+                  </li>
+                )}
               </ul>
             </motion.div>
           </motion.aside>

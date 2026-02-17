@@ -63,7 +63,9 @@
     "language": "Language",
     "english": "English",
     "urdu": "Urdu",
-    "logout": "Logout"
+    "logout": "Logout",
+    "my_account": "My Account",
+    "user_name": "User Name"
   },
    "dashboard": {
     "title": "Dashboard",

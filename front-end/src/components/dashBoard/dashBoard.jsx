@@ -1,56 +1,62 @@
 import { useTranslation } from "react-i18next";
 import AddToDo from "../addToDo/addToDo";
 import TaskList from "../taskList/taskList";
-import UserProfile from "../userProfile/userProfile";
-import { FaTasks, FaUserCircle } from "react-icons/fa";
+import { FaTasks } from "react-icons/fa";
 import { motion } from "framer-motion";
 
 function DashBoard() {
   const { t } = useTranslation();
 
   return (
-    <div className="grid grid-cols-1 p-2 lg:p-10">
-      {/* Dashboard Header */}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 px-4 lg:px-12 py-8">
+      
+      {/* Header */}
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="mb-6"
+        className="max-w-6xl mx-auto mb-10"
       >
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900 flex items-center gap-2">
-          <FaTasks className="text-green-600" /> {t("dashboard.title")}
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">{t("dashboard.subtitle")}</p>
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-gray-900 text-white rounded-2xl shadow-lg">
+            <FaTasks size={20} />
+          </div>
+
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800 tracking-tight">
+              {t("dashboard.title")}
+            </h1>
+            <p className="text-gray-500 mt-1 text-sm sm:text-base">
+              {t("dashboard.subtitle")}
+            </p>
+          </div>
+        </div>
       </motion.div>
 
-      {/* User Profile + Add Task */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <UserProfile />
-        </motion.div>
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto space-y-8">
 
+        {/* Add Task Section */}
         <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="bg-white rounded-3xl shadow-lg p-6 border border-gray-100"
         >
           <AddToDo />
         </motion.div>
-      </div>
 
-      {/* Task List */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="grid grid-cols-1 mt-6"
-      >
-        <TaskList className="w-full" />
-      </motion.div>
+        {/* Task List Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="bg-white rounded-3xl shadow-xl p-6 border border-gray-100"
+        >
+          <TaskList />
+        </motion.div>
+
+      </div>
     </div>
   );
 }

@@ -1,5 +1,11 @@
-import { useEffect, useState } from "react";
-import { FaTrash } from "react-icons/fa";
+import { useEffect, useState, useMemo } from "react";
+import {
+  FaTrash,
+  FaEdit,
+  FaCheckCircle,
+  FaRegCircle,
+  FaSearch,
+} from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
@@ -10,175 +16,247 @@ function TaskList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedTask, setSelectedTask] = useState(null);
+  const [search, setSearch] = useState("");
 
   const token = localStorage.getItem("token");
 
-  // Fetch tasks from API
   const fetchTasks = async () => {
-    if (!token) {
-      setError("User not logged in");
-      setLoading(false);
-      return;
-    }
-
     try {
-      setError("");
       const res = await fetch("http://localhost:3000/api/tasks", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to fetch tasks");
+      if (!res.ok) throw new Error(data.message);
 
       setTasks(data.tasks || []);
     } catch (err) {
-      setError(err.message || "Server error");
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Delete a task
-  const handleDelete = async (taskId) => {
-    if (!token) return alert("Not logged in");
+  const handleDelete = async (id) => {
+    await fetch(`http://localhost:3000/api/task/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-    try {
-      const res = await fetch(`http://localhost:3000/api/task/${taskId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!res.ok) throw new Error("Failed to delete task");
-
-      setTasks((prev) => prev.filter((t) => t._id !== taskId));
-      if (selectedTask?._id === taskId) setSelectedTask(null);
-    } catch (err) {
-      alert(err.message || "Delete failed");
-    }
+    setTasks((prev) => prev.filter((t) => t._id !== id));
+    if (selectedTask?._id === id) setSelectedTask(null);
   };
+
+  const handleToggle = async (task) => {
+  try {
+    const res = await fetch(`http://localhost:3000/api/task/${task._id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ completed: !task.completed }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || "Update failed");
+    }
+
+    // ✅ Use backend response instead of manual update
+    setTasks((prev) =>
+      prev.map((t) =>
+        t._id === task._id ? data.task : t
+      )
+    );
+
+    if (selectedTask?._id === task._id) {
+      setSelectedTask(data.task);
+    }
+
+  } catch (err) {
+    console.error("Toggle error:", err.message);
+  }
+};
+
 
   useEffect(() => {
     fetchTasks();
-    // eslint-disable-next-line
   }, []);
 
-
-  if (loading) {
-    return (
-      <div className="min-h-[40vh] flex items-center justify-center">
-        <p className="text-gray-600 font-semibold">{t("tasksList.loading")}</p>
-      </div>
+  // 🔍 Filtered tasks
+  const filteredTasks = useMemo(() => {
+    return tasks.filter((task) =>
+      task.title.toLowerCase().includes(search.toLowerCase())
     );
-  }
+  }, [tasks, search]);
 
-  if (error) {
-    return (
-      <div className="min-h-[40vh] flex items-center justify-center">
-        <p className="text-red-600 font-semibold">{error}</p>
-      </div>
-    );
-  }
+  // 📊 Stats
+  const completedCount = tasks.filter((t) => t.completed).length;
+  const pendingCount = tasks.length - completedCount;
+
+  if (loading) return <p className="text-center mt-6">Loading...</p>;
+  if (error) return <p className="text-red-500 text-center">{error}</p>;
 
   return (
-    <>
-      <section className="px-4 py-6 flex justify-center">
-        <div className="w-full max-w-2xl rounded-2xl bg-white border shadow-sm">
-          <div className="p-5 border-b">
-            <h2 className="text-xl font-bold">{t("tasksList.your_tasks")}</h2>
-            <p className="text-sm text-gray-500">{t("tasksList.click_task")}</p>
-          </div>
+    <div className="h-full flex flex-col">
 
-          <div className="p-5">
-            {tasks.length === 0 ? (
-              <p className="text-gray-500 text-center">{t("tasksList.no_tasks")}</p>
-            ) : (
-              <ul className="space-y-3">
-                <AnimatePresence>
-                  {tasks.map((task) => (
-                    <motion.li
-                      key={task._id}
-                      layout
-                      onClick={() => setSelectedTask(task)}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      whileHover={{ scale: 1.02 }}
-                      className="flex items-center justify-between rounded-xl border p-4 hover:shadow-lg transition cursor-pointer"
-                    >
-                      <h4 className="font-semibold text-gray-800 hover:underline">
+      {/* Header */}
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">
+          {t("tasksList.your_tasks")}
+        </h2>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="bg-gray-100 rounded-2xl p-4 text-center">
+          <p className="text-sm text-gray-500">Total</p>
+          <p className="text-xl font-bold">{tasks.length}</p>
+        </div>
+        <div className="bg-green-50 rounded-2xl p-4 text-center">
+          <p className="text-sm text-green-600">Completed</p>
+          <p className="text-xl font-bold text-green-700">{completedCount}</p>
+        </div>
+        <div className="bg-yellow-50 rounded-2xl p-4 text-center">
+          <p className="text-sm text-yellow-600">Pending</p>
+          <p className="text-xl font-bold text-yellow-700">{pendingCount}</p>
+        </div>
+      </div>
+
+      {/* Search */}
+      <div className="relative mb-6">
+        <FaSearch className="absolute left-3 top-3 text-gray-400 text-sm" />
+        <input
+          type="text"
+          placeholder="Search tasks..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-gray-900/20 outline-none"
+        />
+      </div>
+
+      {/* Task List */}
+      <div className="flex-1 overflow-y-auto pr-2">
+        {filteredTasks.length === 0 ? (
+          <div className="text-center text-gray-400 mt-10">
+            No matching tasks
+          </div>
+        ) : (
+          <ul className="space-y-4">
+            <AnimatePresence>
+              {filteredTasks.map((task) => (
+                <motion.li
+                  key={task._id}
+                  layout
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  whileHover={{ scale: 1.01 }}
+                  className="bg-white border rounded-2xl p-4 shadow-sm hover:shadow-md transition cursor-pointer"
+                  onClick={() => setSelectedTask(task)}
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggle(task);
+                        }}
+                      >
+                        {task.completed ? (
+                          <FaCheckCircle className="text-green-500" />
+                        ) : (
+                          <FaRegCircle className="text-gray-400" />
+                        )}
+                      </button>
+
+                      <h4
+                        className={`font-semibold ${task.completed
+                            ? "line-through text-gray-400"
+                            : "text-gray-800"
+                          }`}
+                      >
                         {task.title}
                       </h4>
+                    </div>
 
-                      <button
+                    <div className="flex gap-3">
+                      <FaEdit
+                        className="text-blue-500 hover:text-blue-600"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedTask(task);
+                        }}
+                      />
+                      <FaTrash
+                        className="text-red-500 hover:text-red-600"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDelete(task._id);
                         }}
-                        className="text-red-600 hover:text-red-700"
-                        title={t("tasksList.delete")}
-                      >
-                        <FaTrash />
-                      </button>
-                    </motion.li>
-                  ))}
-                </AnimatePresence>
-              </ul>
-            )}
-          </div>
-        </div>
-      </section>
+                      />
+                    </div>
+                  </div>
+                </motion.li>
+              ))}
+            </AnimatePresence>
+          </ul>
+        )}
+      </div>
 
-      {/* Modal / Popup */}
+      {/* Modal */}
       <AnimatePresence>
         {selectedTask && (
           <motion.div
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+            onClick={() => setSelectedTask(null)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg"
+              onClick={(e) => e.stopPropagation()}
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+              className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6"
             >
-              <div className="flex justify-between items-start">
-                <h3 className="text-lg font-bold">{selectedTask.title}</h3>
-                <button
-                  onClick={() => setSelectedTask(null)}
-                  className="text-xl text-gray-400 hover:text-gray-600"
-                >
-                  ×
-                </button>
-              </div>
+              <h3 className="text-xl font-bold mb-3">
+                {selectedTask.title}
+              </h3>
 
-              <div className="mt-4 space-y-3">
-                <div>
-                  <p className="text-xs font-semibold text-gray-500">{t("tasksList.description")}</p>
-                  <p className="text-sm text-gray-700">{selectedTask.description || t("tasksList.no_tasks")}</p>
-                </div>
+              <p className="text-gray-600 mb-4">
+                {selectedTask.description || "No description"}
+              </p>
 
-                <div>
-                  <p className="text-xs font-semibold text-gray-500">{t("tasksList.created_at")}</p>
-                  <p className="text-sm text-gray-700">{new Date(selectedTask.createdAt).toLocaleString()}</p>
-                </div>
+              <div className="text-sm text-gray-500 space-y-1">
+                <p>
+                  Status:{" "}
+                  <span className="font-semibold">
+                    {selectedTask.completed ? "Completed" : "Pending"}
+                  </span>
+                </p>
+                <p>
+                  Created:{" "}
+                  {new Date(selectedTask.createdAt).toLocaleString()}
+                </p>
               </div>
 
               <div className="mt-6 text-right">
                 <button
                   onClick={() => setSelectedTask(null)}
-                  className="rounded-xl bg-gray-900 px-4 py-2 text-sm text-white hover:bg-gray-800"
+                  className="bg-gray-900 text-white px-4 py-2 rounded-xl text-sm hover:bg-gray-800"
                 >
-                  {t("tasksList.close")}
+                  Close
                 </button>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </div>
   );
 }
 

@@ -3,7 +3,7 @@ import serverless from 'serverless-http';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import routes from './routes/routes.js';
-import { dbConnect } from './dbConnect.js';
+import { dbConnect } from './config/db.js';
 
 dotenv.config();
 
@@ -11,7 +11,6 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
-app.use('/api', routes);
 
 // Middleware to ensure DB connection
 app.use(async (req, res, next) => {
@@ -23,13 +22,20 @@ app.use(async (req, res, next) => {
   }
 });
 
+app.use('/api', routes);
 // Example root route
 app.get('/', (req, res) => {
   res.send('Hello! MongoDB Atlas is connected and server is running.');
 });
 
+console.log("Mongo URL:", process.env.MONGO_URL);
+
+app.use("/uploads", express.static("uploads"));
+
+
 // Export for Vercel serverless deployment
 export default serverless(app);
+
 
 // Local testing (optional)
 if (process.env.NODE_ENV !== 'production') {
