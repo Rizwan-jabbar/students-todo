@@ -25,15 +25,34 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // -------------------- CORS --------------------
+import cors from 'cors';
+
+const allowedOrigins = [
+  'http://localhost:3000',                // local dev
+  'http://127.0.0.1:5173',                // Vite dev server
+  'https://students-todo.vercel.app'      // deployed frontend
+];
+
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://127.0.0.1:5173',
-    'https://students-todo.vercel.app'
-  ],
+  origin: function (origin, callback) {
+    // allow requests like Postman / server-to-server
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log('Blocked CORS request from origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET','POST','PUT','DELETE','OPTIONS'],
   allowedHeaders: ['Content-Type','Authorization'],
+  credentials: true,  // optional if you send cookies
 }));
+
+// Handle OPTIONS preflight requests explicitly
+app.options('*', cors());
+
 
 // -------------------- ROUTES --------------------
 app.use('/api', routes);
