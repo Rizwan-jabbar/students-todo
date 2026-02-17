@@ -9,8 +9,13 @@ dotenv.config();
 
 const app = express();
 
+app.use(cors({
+  origin: 'https://students-todo.vercel.app', // replace with your Vercel URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true
+}));
+
 app.use(express.json());
-app.use(cors());
 
 // Middleware to ensure DB connection
 app.use(async (req, res, next) => {
