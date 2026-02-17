@@ -10,15 +10,17 @@ dotenv.config();
 const app = express();
 
 // -------------------- CORS CONFIGURATION --------------------
-const corsOptions = {
-  origin: 'https://students-todo.vercel.app', // frontend URL
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+app.use(cors({
+  origin: [
+    'http://localhost:3000',                     // local dev
+    'https://ecommerce-mern-i4qd.vercel.app'    // deployed frontend
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-};
+  credentials: true,
+}));
 
-app.use(cors(corsOptions));
 
-app.options('*', cors());
 
 
 // -------------------- BODY PARSER --------------------
