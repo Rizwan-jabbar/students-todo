@@ -103,11 +103,10 @@ console.log('user profile rendered' , user);
 
   /* ================= PROFILE ================= */
 
-  const imageUrl = previewImage
-    ? previewImage
-    : user?.profileImage
-    ? `https://students-todo-production.up.railway.app/uploads/${user.profileImage}`
-    : null;
+const imageUrl = previewImage
+  ? previewImage
+  : user?.profileImage || null;
+
 
 
 
