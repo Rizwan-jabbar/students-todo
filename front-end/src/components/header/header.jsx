@@ -77,7 +77,7 @@ function Header() {
             transition={{ duration: 0.5 }}
             className="text-lg font-extrabold text-gray-900"
           >
-           <NavLink to='/'>{t("header.brand")}</NavLink>
+            <NavLink to='/'>{t("header.brand")}</NavLink>
           </motion.p>
 
           {/* DESKTOP NAV */}
@@ -103,23 +103,20 @@ function Header() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className={`absolute top-full mt-2 w-36 rounded-xl border bg-white shadow-lg overflow-hidden z-50 ${
-                      isRTL ? "left-0" : "right-0"
-                    }`}
+                    className={`absolute top-full mt-2 w-36 rounded-xl border bg-white shadow-lg overflow-hidden z-50 ${isRTL ? "left-0" : "right-0"
+                      }`}
                   >
                     <button
                       onClick={() => changeLanguage("ur")}
-                      className={`w-full px-4 py-2 text-${isRTL ? "right" : "left"} hover:bg-gray-100 ${
-                        i18n.language === "ur" && "bg-gray-100 font-semibold"
-                      }`}
+                      className={`w-full px-4 py-2 text-${isRTL ? "right" : "left"} hover:bg-gray-100 ${i18n.language === "ur" && "bg-gray-100 font-semibold"
+                        }`}
                     >
                       {t("header.urdu")}
                     </button>
                     <button
                       onClick={() => changeLanguage("en")}
-                      className={`w-full px-4 py-2 text-${isRTL ? "right" : "left"} hover:bg-gray-100 ${
-                        i18n.language === "en" && "bg-gray-100 font-semibold"
-                      }`}
+                      className={`w-full px-4 py-2 text-${isRTL ? "right" : "left"} hover:bg-gray-100 ${i18n.language === "en" && "bg-gray-100 font-semibold"
+                        }`}
                     >
                       {t("header.english")}
                     </button>
@@ -137,7 +134,7 @@ function Header() {
                 >
                   {user.profileImage ? (
                     <img
-                      src={`${user.profileImage}`}
+                      src={user.profileImage} // <-- Cloudinary secure_url directly
                       alt={user.name}
                       className="h-full w-full object-cover"
                     />
@@ -146,6 +143,7 @@ function Header() {
                       {user.name[0].toUpperCase() || "U"}
                     </span>
                   )}
+
                 </button>
 
                 <AnimatePresence>
@@ -155,9 +153,8 @@ function Header() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.2 }}
-                      className={`absolute top-full mt-2 w-48 rounded-xl border bg-white shadow-lg overflow-hidden z-50 ${
-                        isRTL ? "left-0" : "right-0"
-                      }`}
+                      className={`absolute top-full mt-2 w-48 rounded-xl border bg-white shadow-lg overflow-hidden z-50 ${isRTL ? "left-0" : "right-0"
+                        }`}
                     >
                       <div className="px-4 py-2 border-b text-sm text-gray-700 font-semibold truncate">
                         {user.name}
@@ -222,17 +219,15 @@ function Header() {
                   <p className="text-xs text-gray-500 mb-2">{t("header.language")}</p>
                   <button
                     onClick={() => changeLanguage("ur")}
-                    className={`w-full px-3 py-2 rounded text-${isRTL ? "right" : "left"} hover:bg-gray-100 ${
-                      i18n.language === "ur" && "bg-gray-100 font-semibold"
-                    }`}
+                    className={`w-full px-3 py-2 rounded text-${isRTL ? "right" : "left"} hover:bg-gray-100 ${i18n.language === "ur" && "bg-gray-100 font-semibold"
+                      }`}
                   >
                     {t("header.urdu")}
                   </button>
                   <button
                     onClick={() => changeLanguage("en")}
-                    className={`w-full px-3 py-2 rounded text-${isRTL ? "right" : "left"} hover:bg-gray-100 ${
-                      i18n.language === "en" && "bg-gray-100 font-semibold"
-                    }`}
+                    className={`w-full px-3 py-2 rounded text-${isRTL ? "right" : "left"} hover:bg-gray-100 ${i18n.language === "en" && "bg-gray-100 font-semibold"
+                      }`}
                   >
                     {t("header.english")}
                   </button>
