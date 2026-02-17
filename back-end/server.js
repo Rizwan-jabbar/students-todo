@@ -25,7 +25,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // -------------------- CORS --------------------
-import cors from 'cors';
 
 const allowedOrigins = [
   'http://localhost:3000',                // local dev
@@ -50,8 +49,6 @@ app.use(cors({
   credentials: true,  // optional if you send cookies
 }));
 
-// Handle OPTIONS preflight requests explicitly
-app.options('*', cors());
 
 
 // -------------------- ROUTES --------------------
