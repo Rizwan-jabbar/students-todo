@@ -5,8 +5,14 @@ dotenv.config();
 import connectDB from './config/db.js';
 import cors from 'cors';
 import routes from './routes/routes.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const app = express();
+
+// Fix for __dirname in ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // -------------------- DATABASE CONNECTION --------------------
 (async () => {
@@ -42,8 +48,8 @@ app.use(cors({
   credentials: true,
 }));
 
+// -------------------- SERVE UPLOADS --------------------
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
 
 // -------------------- ROUTES --------------------
 app.use('/api', routes);
