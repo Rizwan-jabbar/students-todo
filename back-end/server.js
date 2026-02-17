@@ -11,38 +11,43 @@ const app = express();
 // -------------------- BODY PARSER --------------------
 app.use(express.json());
 
-// -------------------- CORS MIDDLEWARE --------------------
-const allowedOrigins = [
-  'https://students-todo.vercel.app', // production frontend
-  'http://localhost:3000'             // local frontend for dev
-];
-
-app.use(cors({
-  origin: (origin, callback) => {
-    // allow requests with no origin (like Postman)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
-
 // -------------------- DATABASE CONNECTION --------------------
-app.use(async (req, res, next) => {
+// Connect once at startup instead of on every request
+(async () => {
   try {
     await dbConnect();
-    next();
+    console.log('✅ Database connected');
   } catch (err) {
-    console.error('DB connection error:', err);
-    res.status(500).json({ error: 'Database connection failed' });
+    console.error('❌ Database connection failed:', err);
+    process.exit(1); // stop server if DB fails
   }
-});
+})();
+
+// -------------------- CORS MIDDLEWARE --------------------
+// Allowed origins (add all dev URLs you use)
+const allowedOrigins = [
+  'https://students-todo.vercel.app', // production frontend
+  'http://localhost:3000',             // local React
+  'http://127.0.0.1:5173',             // Vite dev server, if used
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // allow server-to-server requests (Postman, curl) which have no origin
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        console.log('Blocked CORS request from origin:', origin);
+        return callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 
 // -------------------- API ROUTES --------------------
 app.use('/api', routes);
@@ -59,5 +64,5 @@ export default serverless(app);
 // -------------------- LOCAL DEVELOPMENT --------------------
 if (process.env.NODE_ENV !== 'production') {
   const port = process.env.PORT || 3000;
-  app.listen(port, () => console.log(`Server listening on ${port}`));
+  app.listen(port, () => console.log(`Server listening on port ${port}`));
 }
