@@ -1,51 +1,62 @@
 import express from 'express';
 import serverless from 'serverless-http';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import routes from './routes/routes.js';
 import { dbConnect } from './config/db.js';
 
 dotenv.config();
 const app = express();
 
-// Body parser
+// -------------------- BODY PARSER --------------------
 app.use(express.json());
 
-// Database connection middleware
+// -------------------- CORS MIDDLEWARE --------------------
+const allowedOrigins = [
+  'https://students-todo.vercel.app', // production frontend
+  'http://localhost:3000'             // local frontend for dev
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // allow requests with no origin (like Postman)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
+// -------------------- DATABASE CONNECTION --------------------
 app.use(async (req, res, next) => {
   try {
     await dbConnect();
     next();
   } catch (err) {
+    console.error('DB connection error:', err);
     res.status(500).json({ error: 'Database connection failed' });
   }
 });
 
-// -------------------- SIMPLE CORS --------------------
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://students-todo.vercel.app'); // frontend URL
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
-
-  // OPTIONS request ke liye early return
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(204);
-  }
-  next();
-});
-
-// API routes
+// -------------------- API ROUTES --------------------
 app.use('/api', routes);
 
-// Root
+// -------------------- ROOT ROUTE --------------------
 app.get('/', (req, res) => res.send('Server running!'));
 
-// Static files
+// -------------------- STATIC FILES --------------------
 app.use('/uploads', express.static('uploads'));
 
-// Serverless export
+// -------------------- SERVERLESS EXPORT --------------------
 export default serverless(app);
 
-// Local testing
+// -------------------- LOCAL DEVELOPMENT --------------------
 if (process.env.NODE_ENV !== 'production') {
   const port = process.env.PORT || 3000;
   app.listen(port, () => console.log(`Server listening on ${port}`));
