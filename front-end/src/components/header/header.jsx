@@ -4,7 +4,6 @@ import { FaTimes, FaSignOutAlt, FaGlobe, FaChevronDown } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
-const API_BASE_URL = process.env.REACT_APP_TODO_API_BASE_URL;
 
 
 function Header() {
@@ -138,7 +137,7 @@ function Header() {
                 >
                   {user.profileImage ? (
                     <img
-                      src={`${API_BASE_URL}/uploads/${user.profileImage}`}
+                      src={`https://students-todo-production.up.railway.app/uploads/${user.profileImage}`}
                       alt={user.name}
                       className="h-full w-full object-cover"
                     />
@@ -246,7 +245,7 @@ function Header() {
                       <div className="h-10 w-10 rounded-full overflow-hidden border-2 border-gray-300 flex items-center justify-center">
                         {user.profileImage ? (
                           <img
-                            src={`${API_BASE_URL}/uploads/${user.profileImage}`}
+                            src={`https://students-todo-production.up.railway.app/uploads/${user.profileImage}`}
                             alt={user.name}
                             className="h-full w-full object-cover"
                           />

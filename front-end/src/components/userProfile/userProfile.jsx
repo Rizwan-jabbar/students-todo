@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { FiRefreshCw, FiCamera } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-const API_BASE_URL = process.env.REACT_APP_TODO_API_BASE_URL;
 
 
 function UserProfile() {
@@ -28,7 +27,7 @@ function UserProfile() {
       setLoading(true);
       setError("");
 
-      const res = await fetch(`${API_BASE_URL}/api/me`, {
+      const res = await fetch(`https://students-todo-production.up.railway.app/api/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -58,7 +57,7 @@ function UserProfile() {
       setUploading(true);
 
       const res = await fetch(
-        `${API_BASE_URL}/api/updateProfileImage`,
+        `https://students-todo-production.up.railway.app/api/updateProfileImage`,
         {
           method: "PUT",
           headers: {
@@ -107,7 +106,7 @@ function UserProfile() {
   const imageUrl = previewImage
     ? previewImage
     : user?.profileImage
-    ? `${API_BASE_URL}/uploads/${user.profileImage}`
+    ? `https://students-todo-production.up.railway.app/uploads/${user.profileImage}`
     : null;
 
   return (

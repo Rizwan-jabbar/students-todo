@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaGlobe, FaChevronDown } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
-const API_BASE_URL = process.env.REACT_APP_TODO_API_BASE_URL;
 
 function Login() {
   const { t, i18n } = useTranslation();
@@ -21,7 +20,7 @@ function Login() {
     };
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/login`, {
+      const response = await fetch(`https://students-todo-production.up.railway.app/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData)

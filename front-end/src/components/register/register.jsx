@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { FaGlobe, FaChevronDown } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { NavLink } from "react-router-dom";
-const API_BASE_URL = process.env.REACT_APP_TODO_API_BASE_URL;
 
 
 function RegisterForm() {
@@ -30,7 +29,7 @@ function RegisterForm() {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/register`, {
+      const response = await fetch(`https://students-todo-production.up.railway.app/api/register`, {
         method: "POST",
         body: formData, // ⚠️ no Content-Type header
       });
