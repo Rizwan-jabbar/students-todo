@@ -20,7 +20,7 @@ function Login() {
     };
 
     try {
-      const response = await fetch("https://students-todo.up.railway.app/api/login", {
+      const response = await fetch("https://students-todo-production.up.railway.app/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData)

@@ -1,30 +1,16 @@
 import express from 'express';
 import serverless from 'serverless-http';
-import cors from 'cors';
 import dotenv from 'dotenv';
 import routes from './routes/routes.js';
 import { dbConnect } from './config/db.js';
 
 dotenv.config();
-
 const app = express();
 
-// -------------------- CORS --------------------
-const corsOptions = {
-  origin: ['http://localhost:3000', 'https://students-todo.vercel.app'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-};
-
-app.use(cors(corsOptions));
-
-// Explicitly handle preflight OPTIONS requests
-app.options('*', cors(corsOptions)); 
-
-// -------------------- BODY PARSER --------------------
+// Body parser
 app.use(express.json());
 
-// -------------------- DATABASE --------------------
+// Database connection middleware
 app.use(async (req, res, next) => {
   try {
     await dbConnect();
@@ -34,21 +20,32 @@ app.use(async (req, res, next) => {
   }
 });
 
-// -------------------- ROUTES --------------------
+// -------------------- SIMPLE CORS --------------------
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://students-todo.vercel.app'); // frontend URL
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+
+  // OPTIONS request ke liye early return
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+  next();
+});
+
+// API routes
 app.use('/api', routes);
 
 // Root
-app.get('/', (req, res) => {
-  res.send('Server running!');
-});
+app.get('/', (req, res) => res.send('Server running!'));
 
 // Static files
 app.use('/uploads', express.static('uploads'));
 
-// -------------------- SERVERLESS EXPORT --------------------
+// Serverless export
 export default serverless(app);
 
-// Local test
+// Local testing
 if (process.env.NODE_ENV !== 'production') {
   const port = process.env.PORT || 3000;
   app.listen(port, () => console.log(`Server listening on ${port}`));
