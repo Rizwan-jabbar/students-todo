@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { FiRefreshCw, FiCamera } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+const API_BASE_URL = process.env.REACT_APP_TODO_API_BASE_URL;
+
 
 function UserProfile() {
   const { t } = useTranslation();
@@ -26,7 +28,7 @@ function UserProfile() {
       setLoading(true);
       setError("");
 
-      const res = await fetch("http://localhost:3000/api/me", {
+      const res = await fetch(`${API_BASE_URL}/api/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -56,7 +58,7 @@ function UserProfile() {
       setUploading(true);
 
       const res = await fetch(
-        "http://localhost:3000/api/updateProfileImage",
+        `${API_BASE_URL}/api/updateProfileImage`,
         {
           method: "PUT",
           headers: {
@@ -105,7 +107,7 @@ function UserProfile() {
   const imageUrl = previewImage
     ? previewImage
     : user?.profileImage
-    ? `http://localhost:3000/uploads/${user.profileImage}`
+    ? `${API_BASE_URL}/uploads/${user.profileImage}`
     : null;
 
   return (

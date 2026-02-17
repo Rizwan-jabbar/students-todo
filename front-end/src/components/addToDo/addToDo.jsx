@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaPlus, FaTrash, FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
+const API_BASE_URL = process.env.REACT_APP_TODO_API_BASE_URL;
+
 
 function AddToDo() {
   const { t } = useTranslation();
@@ -33,7 +35,7 @@ function AddToDo() {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:3000/api/task", {
+      const res = await fetch(`${API_BASE_URL}/api/task`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

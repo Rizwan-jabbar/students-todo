@@ -8,6 +8,7 @@ import {
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
+const API_BASE_URL = process.env.REACT_APP_TODO_API_BASE_URL;
 
 function TaskList() {
   const { t } = useTranslation();
@@ -22,7 +23,7 @@ function TaskList() {
 
   const fetchTasks = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/tasks", {
+      const res = await fetch(`${API_BASE_URL}/api/tasks`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -38,7 +39,7 @@ function TaskList() {
   };
 
   const handleDelete = async (id) => {
-    await fetch(`http://localhost:3000/api/task/${id}`, {
+    await fetch(`${API_BASE_URL}/api/task/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -49,7 +50,7 @@ function TaskList() {
 
   const handleToggle = async (task) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/task/${task._id}`, {
+    const res = await fetch(`${API_BASE_URL}/api/task/${task._id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
