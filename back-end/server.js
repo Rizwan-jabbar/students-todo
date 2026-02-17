@@ -14,13 +14,9 @@ const corsOptions = {
   origin: 'https://students-todo.vercel.app', // frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
 };
 
 app.use(cors(corsOptions));
-
-// Handle preflight OPTIONS requests
-app.options('*', cors(corsOptions));
 
 // -------------------- BODY PARSER --------------------
 app.use(express.json());
