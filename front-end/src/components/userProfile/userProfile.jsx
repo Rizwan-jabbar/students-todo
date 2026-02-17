@@ -3,7 +3,6 @@ import { FiRefreshCw, FiCamera } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
-
 function UserProfile() {
   const { t } = useTranslation();
 
@@ -12,7 +11,7 @@ function UserProfile() {
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
-console.log('user profile rendered' , user);
+
   const token = localStorage.getItem("token");
 
   /* ================= FETCH PROFILE ================= */
@@ -27,11 +26,12 @@ console.log('user profile rendered' , user);
       setLoading(true);
       setError("");
 
-      const res = await fetch(`https://students-todo-production.up.railway.app/api/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `https://students-todo-production.up.railway.app/api/me`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (!res.ok) throw new Error("Unauthorized");
 
@@ -60,9 +60,7 @@ console.log('user profile rendered' , user);
         `https://students-todo-production.up.railway.app/api/updateProfileImage`,
         {
           method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
           body: formData,
         }
       );
@@ -70,7 +68,8 @@ console.log('user profile rendered' , user);
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
 
-      await fetchProfile(); // refresh profile
+      // Refresh profile after upload
+      await fetchProfile();
       setPreviewImage(null);
     } catch (error) {
       console.error("Upload failed:", error.message);
@@ -103,12 +102,7 @@ console.log('user profile rendered' , user);
 
   /* ================= PROFILE ================= */
 
-const imageUrl = previewImage
-  ? previewImage
-  : user?.profileImage || null;
-
-
-
+  const imageUrl = previewImage || user?.profileImage || null;
 
   return (
     <section className="px-4 py-8 flex justify-center">
@@ -164,9 +158,7 @@ const imageUrl = previewImage
 
                 {/* User Info */}
                 <div>
-                  <h2 className="text-xl font-bold capitalize">
-                    {user?.name}
-                  </h2>
+                  <h2 className="text-xl font-bold capitalize">{user?.name}</h2>
                   <p className="text-sm text-gray-500">{user?.email}</p>
                 </div>
               </div>
@@ -184,21 +176,13 @@ const imageUrl = previewImage
           {/* Details */}
           <div className="p-6 space-y-3">
             <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-              <p className="text-xs font-semibold text-gray-500">
-                {t("user_profile.name")}
-              </p>
-              <p className="mt-1 text-sm font-semibold capitalize">
-                {user?.name}
-              </p>
+              <p className="text-xs font-semibold text-gray-500">{t("user_profile.name")}</p>
+              <p className="mt-1 text-sm font-semibold capitalize">{user?.name}</p>
             </div>
 
             <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-              <p className="text-xs font-semibold text-gray-500">
-                {t("user_profile.email")}
-              </p>
-              <p className="mt-1 text-sm font-semibold">
-                {user?.email}
-              </p>
+              <p className="text-xs font-semibold text-gray-500">{t("user_profile.email")}</p>
+              <p className="mt-1 text-sm font-semibold">{user?.email}</p>
             </div>
           </div>
         </motion.div>
