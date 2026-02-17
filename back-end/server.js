@@ -28,6 +28,8 @@ const __dirname = path.dirname(__filename);
 // -------------------- MIDDLEWARE --------------------
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// -------------------- SERVE UPLOADS --------------------
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // -------------------- CORS --------------------
 const allowedOrigins = [
@@ -48,8 +50,7 @@ app.use(cors({
   credentials: true,
 }));
 
-// -------------------- SERVE UPLOADS --------------------
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // -------------------- ROUTES --------------------
 app.use('/api', routes);

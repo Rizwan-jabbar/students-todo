@@ -77,7 +77,7 @@ function Header() {
             transition={{ duration: 0.5 }}
             className="text-lg font-extrabold text-gray-900"
           >
-            {t("header.brand")}
+           <NavLink to='/'>{t("header.brand")}</NavLink>
           </motion.p>
 
           {/* DESKTOP NAV */}
