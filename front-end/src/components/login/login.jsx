@@ -23,8 +23,9 @@ function Login() {
       const response = await fetch("https://students-todo.up.railway.app/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(loginData),
+        body: JSON.stringify(loginData)
       });
+
 
       const data = await response.json();
 
@@ -52,55 +53,53 @@ function Login() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col items-center justify-center px-4 py-10">
-       {/* ---------------- PROFESSIONAL LANGUAGE SELECTOR ---------------- */}
-        <div className="mb-6">
-          <div className="relative inline-block text-left">
-            <button
-              onClick={() => setShowLang((s) => !s)}
-              className="inline-flex justify-between items-center w-28 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
-            >
-              <FaGlobe />
-              {i18n.language === "ur" ? "اردو" : "English"}
-              <FaChevronDown
-                className={`ml-2 h-4 w-4 transform transition-transform ${showLang ? "rotate-180" : "rotate-0"}`}
-              />
-            </button>
+      {/* ---------------- PROFESSIONAL LANGUAGE SELECTOR ---------------- */}
+      <div className="mb-6">
+        <div className="relative inline-block text-left">
+          <button
+            onClick={() => setShowLang((s) => !s)}
+            className="inline-flex justify-between items-center w-28 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+          >
+            <FaGlobe />
+            {i18n.language === "ur" ? "اردو" : "English"}
+            <FaChevronDown
+              className={`ml-2 h-4 w-4 transform transition-transform ${showLang ? "rotate-180" : "rotate-0"}`}
+            />
+          </button>
 
-            <AnimatePresence>
-              {showLang && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className="origin-top-right absolute right-0 mt-2 w-36 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-20"
-                >
-                  <div className="py-1">
-                    <button
-                      onClick={() => changeLanguage("en")}
-                      className={`block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 transition ${
-                        i18n.language === "en" ? "bg-gray-100 font-semibold" : ""
+          <AnimatePresence>
+            {showLang && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="origin-top-right absolute right-0 mt-2 w-36 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-20"
+              >
+                <div className="py-1">
+                  <button
+                    onClick={() => changeLanguage("en")}
+                    className={`block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 transition ${i18n.language === "en" ? "bg-gray-100 font-semibold" : ""
                       }`}
-                    >
-                      English
-                    </button>
-                    <button
-                      onClick={() => changeLanguage("ur")}
-                      className={`block w-full px-4 py-2 text-right text-sm text-gray-700 hover:bg-gray-100 transition ${
-                        i18n.language === "ur" ? "bg-gray-100 font-semibold" : ""
+                  >
+                    English
+                  </button>
+                  <button
+                    onClick={() => changeLanguage("ur")}
+                    className={`block w-full px-4 py-2 text-right text-sm text-gray-700 hover:bg-gray-100 transition ${i18n.language === "ur" ? "bg-gray-100 font-semibold" : ""
                       }`}
-                    >
-                      اردو
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                  >
+                    اردو
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
+      </div>
       <div className="w-full max-w-md relative">
 
-       
+
 
         {/* ---------------- LOGIN FORM CARD ---------------- */}
         <motion.div

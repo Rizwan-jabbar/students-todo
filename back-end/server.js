@@ -9,24 +9,22 @@ dotenv.config();
 
 const app = express();
 
-// -------------------- CORS CONFIGURATION --------------------
-app.use(cors({
-  origin: [
-    'http://localhost:3000',                     // local dev
-    'https://students-todo.vercel.app'    // deployed frontend
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+// -------------------- CORS --------------------
+const corsOptions = {
+  origin: ['http://localhost:3000', 'https://students-todo.vercel.app'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-}));
+};
 
+app.use(cors(corsOptions));
 
-
+// Explicitly handle preflight OPTIONS requests
+app.options('*', cors(corsOptions)); 
 
 // -------------------- BODY PARSER --------------------
 app.use(express.json());
 
-// -------------------- DATABASE CONNECTION --------------------
+// -------------------- DATABASE --------------------
 app.use(async (req, res, next) => {
   try {
     await dbConnect();
@@ -39,21 +37,19 @@ app.use(async (req, res, next) => {
 // -------------------- ROUTES --------------------
 app.use('/api', routes);
 
-// Root route
+// Root
 app.get('/', (req, res) => {
-  res.send('Hello! MongoDB Atlas is connected and server is running.');
+  res.send('Server running!');
 });
 
-// -------------------- STATIC FILES --------------------
-app.use("/uploads", express.static("uploads"));
+// Static files
+app.use('/uploads', express.static('uploads'));
 
 // -------------------- SERVERLESS EXPORT --------------------
 export default serverless(app);
 
-// -------------------- LOCAL TESTING --------------------
+// Local test
 if (process.env.NODE_ENV !== 'production') {
   const port = process.env.PORT || 3000;
-  app.listen(port, () => {
-    console.log(`App listening on port ${port}`);
-  });
+  app.listen(port, () => console.log(`Server listening on ${port}`));
 }
