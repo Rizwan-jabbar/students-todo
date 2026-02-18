@@ -27,7 +27,10 @@ function TaskList({ tasks, setTasks }) {
     );
 
     setTasks((prev) => prev.filter((t) => t._id !== id));
-    if (selectedTask?._id === id) setSelectedTask(null);
+
+    if (selectedTask?._id === id) {
+      setSelectedTask(null);
+    }
   };
 
   const handleToggle = async (task) => {
@@ -45,10 +48,7 @@ function TaskList({ tasks, setTasks }) {
       );
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Update failed");
-      }
+      if (!res.ok) throw new Error(data.message);
 
       setTasks((prev) =>
         prev.map((t) =>
@@ -61,18 +61,16 @@ function TaskList({ tasks, setTasks }) {
       }
 
     } catch (err) {
-      console.error("Toggle error:", err.message);
+      console.error(err.message);
     }
   };
 
-  // 🔍 Filtered tasks
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) =>
       task.title.toLowerCase().includes(search.toLowerCase())
     );
   }, [tasks, search]);
 
-  // 📊 Stats
   const completedCount = tasks.filter((t) => t.completed).length;
   const pendingCount = tasks.length - completedCount;
 
@@ -94,11 +92,15 @@ function TaskList({ tasks, setTasks }) {
         </div>
         <div className="bg-green-50 rounded-2xl p-4 text-center">
           <p className="text-sm text-green-600">Completed</p>
-          <p className="text-xl font-bold text-green-700">{completedCount}</p>
+          <p className="text-xl font-bold text-green-700">
+            {completedCount}
+          </p>
         </div>
         <div className="bg-yellow-50 rounded-2xl p-4 text-center">
           <p className="text-sm text-yellow-600">Pending</p>
-          <p className="text-xl font-bold text-yellow-700">{pendingCount}</p>
+          <p className="text-xl font-bold text-yellow-700">
+            {pendingCount}
+          </p>
         </div>
       </div>
 
@@ -130,7 +132,6 @@ function TaskList({ tasks, setTasks }) {
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  whileHover={{ scale: 1.01 }}
                   className="bg-white border rounded-2xl p-4 shadow-sm hover:shadow-md transition cursor-pointer"
                   onClick={() => setSelectedTask(task)}
                 >
@@ -160,22 +161,13 @@ function TaskList({ tasks, setTasks }) {
                       </h4>
                     </div>
 
-                    <div className="flex gap-3">
-                      <FaEdit
-                        className="text-blue-500 hover:text-blue-600"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedTask(task);
-                        }}
-                      />
-                      <FaTrash
-                        className="text-red-500 hover:text-red-600"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(task._id);
-                        }}
-                      />
-                    </div>
+                    <FaTrash
+                      className="text-red-500 hover:text-red-600"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(task._id);
+                      }}
+                    />
                   </div>
                 </motion.li>
               ))}
@@ -184,7 +176,59 @@ function TaskList({ tasks, setTasks }) {
         )}
       </div>
 
-      {/* Modal same as before */}
+      {/* ✅ MODAL POPUP */}
+      <AnimatePresence>
+        {selectedTask && (
+          <motion.div
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedTask(null)}
+          >
+            <motion.div
+              onClick={(e) => e.stopPropagation()}
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+              className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6"
+            >
+              <h3 className="text-xl font-bold mb-3">
+                {selectedTask.title}
+              </h3>
+
+              <p className="text-gray-600 mb-4">
+                {selectedTask.description || "No description"}
+              </p>
+
+              <div className="text-sm text-gray-500 space-y-1">
+                <p>
+                  Status:{" "}
+                  <span className="font-semibold">
+                    {selectedTask.completed
+                      ? "Completed"
+                      : "Pending"}
+                  </span>
+                </p>
+                <p>
+                  Created:{" "}
+                  {new Date(selectedTask.createdAt).toLocaleString()}
+                </p>
+              </div>
+
+              <div className="mt-6 text-right">
+                <button
+                  onClick={() => setSelectedTask(null)}
+                  className="bg-gray-900 text-white px-4 py-2 rounded-xl text-sm hover:bg-gray-800"
+                >
+                  Close
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }
