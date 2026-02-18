@@ -56,9 +56,13 @@ function Header() {
     setShowMenu(false);
   };
 
-  const NavItem = ({ children }) => (
+  const NavItem = ({ children, isMobile = false }) => (
     <li>
-      <button className="w-full lg:w-auto text-left lg:text-center rounded-xl px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
+      <button className={`w-full lg:w-auto text-left lg:text-center rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 shadow-sm hover:shadow-md ${
+        isMobile 
+          ? 'text-purple-900 bg-white hover:bg-purple-100' 
+          : 'text-white hover:bg-white/20 hover:backdrop-blur-md'
+      }`}>
         {children}
       </button>
     </li>
@@ -67,18 +71,21 @@ function Header() {
   const isRTL = i18n.language === "ur";
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
+    <header className="sticky top-0 z-50 w-full border-b bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 shadow-lg backdrop-blur-sm">
       <div className="mx-auto max-w-7xl px-4">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-18 items-center justify-between">
           {/* BRAND */}
-          <motion.p
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="text-lg font-extrabold text-gray-900"
+            className="flex items-center gap-2"
           >
-            <NavLink to='/'>{t("header.brand")}</NavLink>
-          </motion.p>
+            <NavLink to='/' className="text-2xl font-black text-white drop-shadow-lg hover:scale-105 transition-transform duration-200 flex items-center gap-2">
+              <span className="bg-white text-purple-600 rounded-lg px-2 py-1 text-xl">📝</span>
+              {t("header.brand")}
+            </NavLink>
+          </motion.div>
 
           {/* DESKTOP NAV */}
           <nav className="hidden lg:flex items-center gap-4">
@@ -89,9 +96,9 @@ function Header() {
             <div ref={langRef} className="relative">
               <button
                 onClick={() => setShowLang((s) => !s)}
-                className="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-gray-50 transition"
+                className="inline-flex items-center gap-2 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/30 transition-all duration-200 shadow-md hover:shadow-lg"
               >
-                <FaGlobe />
+                <FaGlobe className="text-base" />
                 {i18n.language === "ur" ? t("header.urdu") : t("header.english")}
                 <FaChevronDown className="text-xs" />
               </button>
@@ -130,7 +137,7 @@ function Header() {
               <div ref={userRef} className="relative">
                 <button
                   onClick={() => setShowUserDropdown((s) => !s)}
-                  className="h-10 w-10 rounded-full overflow-hidden border-2 border-gray-300 flex items-center justify-center cursor-pointer"
+                  className="h-11 w-11 rounded-full overflow-hidden border-3 border-white shadow-lg hover:shadow-xl flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-200"
                 >
                   {user.profileImage ? (
                     <img
@@ -139,7 +146,7 @@ function Header() {
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <span className="bg-green-500 text-white font-bold">
+                    <span className="bg-gradient-to-br from-green-400 to-green-600 text-white font-bold text-lg h-full w-full flex items-center justify-center">
                       {user.name[0].toUpperCase() || "U"}
                     </span>
                   )}
@@ -179,9 +186,9 @@ function Header() {
           <div className="lg:hidden">
             <button
               onClick={() => setShowMenu(true)}
-              className="p-2 border rounded-xl hover:bg-gray-100 transition"
+              className="p-2.5 bg-white/20 backdrop-blur-md border border-white/30 rounded-xl text-white hover:bg-white/30 transition-all duration-200 shadow-md hover:shadow-lg"
             >
-              <GiHamburgerMenu />
+              <GiHamburgerMenu className="text-xl" />
             </button>
           </div>
         </div>
@@ -201,32 +208,35 @@ function Header() {
               animate={{ x: 0 }}
               exit={{ x: 300 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className={`h-full w-72 bg-white p-4 ${isRTL ? "rtl" : "ltr"}`}
+              className={`h-full w-80 bg-gradient-to-br from-blue-50 to-purple-50 p-6 shadow-2xl ${isRTL ? "rtl" : "ltr"}`}
             >
-              <div className="flex justify-between items-center mb-4">
-                <p className="font-bold">{t("header.menu")}</p>
-                <button onClick={() => setShowMenu(false)}>
-                  <FaTimes />
+              <div className="flex justify-between items-center mb-6 pb-4 border-b-2 border-purple-200">
+                <p className="font-bold text-xl text-purple-900">{t("header.menu")}</p>
+                <button 
+                  onClick={() => setShowMenu(false)}
+                  className="p-2 hover:bg-purple-100 rounded-lg transition-colors duration-200"
+                >
+                  <FaTimes className="text-purple-600 text-lg" />
                 </button>
               </div>
 
-              <ul className="space-y-2">
-                <NavItem>{t("header.nav.home")}</NavItem>
-                <NavItem>{t("header.nav.todos")}</NavItem>
+              <ul className="space-y-3">
+                <NavItem isMobile={true}>{t("header.nav.home")}</NavItem>
+                <NavItem isMobile={true}>{t("header.nav.todos")}</NavItem>
 
                 {/* LANGUAGE */}
-                <li className="pt-4 border-t">
-                  <p className="text-xs text-gray-500 mb-2">{t("header.language")}</p>
+                <li className="pt-4 border-t-2 border-purple-200">
+                  <p className="text-xs font-semibold text-purple-700 mb-3 uppercase tracking-wide">{t("header.language")}</p>
                   <button
                     onClick={() => changeLanguage("ur")}
-                    className={`w-full px-3 py-2 rounded text-${isRTL ? "right" : "left"} hover:bg-gray-100 ${i18n.language === "ur" && "bg-gray-100 font-semibold"
+                    className={`w-full px-4 py-2.5 rounded-lg text-${isRTL ? "right" : "left"} hover:bg-purple-100 transition-colors duration-200 ${i18n.language === "ur" && "bg-purple-200 font-semibold text-purple-900"
                       }`}
                   >
                     {t("header.urdu")}
                   </button>
                   <button
                     onClick={() => changeLanguage("en")}
-                    className={`w-full px-3 py-2 rounded text-${isRTL ? "right" : "left"} hover:bg-gray-100 ${i18n.language === "en" && "bg-gray-100 font-semibold"
+                    className={`w-full px-4 py-2.5 rounded-lg text-${isRTL ? "right" : "left"} hover:bg-purple-100 transition-colors duration-200 ${i18n.language === "en" && "bg-purple-200 font-semibold text-purple-900"
                       }`}
                   >
                     {t("header.english")}
@@ -235,9 +245,9 @@ function Header() {
 
                 {/* USER PROFILE MOBILE */}
                 {user && (
-                  <li className="pt-4 border-t">
-                    <div className="flex items-center gap-3 px-3 py-2">
-                      <div className="h-10 w-10 rounded-full overflow-hidden border-2 border-gray-300 flex items-center justify-center">
+                  <li className="pt-4 border-t-2 border-purple-200">
+                    <div className="flex items-center gap-3 px-3 py-3 bg-white rounded-xl shadow-sm">
+                      <div className="h-12 w-12 rounded-full overflow-hidden border-3 border-purple-300 flex items-center justify-center shadow-md">
                         {user.profileImage ? (
                           <img
                             src={`https://students-todo-production.up.railway.app/uploads/${user.profileImage}`}
@@ -245,19 +255,19 @@ function Header() {
                             className="h-full w-full object-cover"
                           />
                         ) : (
-                          <span className="bg-green-500 text-white font-bold">
+                          <span className="bg-gradient-to-br from-green-400 to-green-600 text-white font-bold text-lg h-full w-full flex items-center justify-center">
                             {user.name[0].toUpperCase() || "U"}
                           </span>
                         )}
                       </div>
-                      <span className="font-semibold text-gray-700 truncate">{user.name}</span>
+                      <span className="font-semibold text-purple-900 truncate">{user.name}</span>
                     </div>
-                    <button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">
+                    <button className="w-full text-left px-4 py-2.5 hover:bg-purple-100 transition-colors duration-200 text-sm rounded-lg mt-2">
                       {t("header.my_account")}
                     </button>
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm text-red-600 font-semibold flex items-center gap-2"
+                      className="w-full text-left px-4 py-2.5 hover:bg-red-50 transition-colors duration-200 text-sm text-red-600 font-semibold flex items-center gap-2 rounded-lg"
                     >
                       <FaSignOutAlt /> {t("header.logout")}
                     </button>
