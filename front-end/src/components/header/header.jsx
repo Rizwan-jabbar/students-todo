@@ -5,6 +5,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 
+// NavItem component outside of Header to avoid recreation during render
+const NavItem = ({ children, isMobile = false }) => (
+  <li>
+    <button className={`w-full lg:w-auto text-left lg:text-center rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 shadow-sm hover:shadow-md ${
+      isMobile 
+        ? 'text-purple-900 bg-white hover:bg-purple-100' 
+        : 'text-white hover:bg-white/20 hover:backdrop-blur-md'
+    }`}>
+      {children}
+    </button>
+  </li>
+);
 
 function Header() {
   const [showMenu, setShowMenu] = useState(false);
@@ -12,12 +24,10 @@ function Header() {
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [user, setUser] = useState(null);
 
-  const hamburgerRef = useRef(null);
   const langRef = useRef(null);
   const userRef = useRef(null);
 
   const { t, i18n } = useTranslation();
-  const token = localStorage.getItem("token");
 
   /* ===================== FETCH USER ===================== */
   useEffect(() => {
@@ -55,18 +65,6 @@ function Header() {
     setShowLang(false);
     setShowMenu(false);
   };
-
-  const NavItem = ({ children, isMobile = false }) => (
-    <li>
-      <button className={`w-full lg:w-auto text-left lg:text-center rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 shadow-sm hover:shadow-md ${
-        isMobile 
-          ? 'text-purple-900 bg-white hover:bg-purple-100' 
-          : 'text-white hover:bg-white/20 hover:backdrop-blur-md'
-      }`}>
-        {children}
-      </button>
-    </li>
-  );
 
   const isRTL = i18n.language === "ur";
 
