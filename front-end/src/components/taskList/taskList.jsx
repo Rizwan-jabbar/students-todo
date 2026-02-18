@@ -83,7 +83,7 @@ function TaskList() {
 
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [tasks]);
 
   // 🔍 Filtered tasks
   const filteredTasks = useMemo(() => {
