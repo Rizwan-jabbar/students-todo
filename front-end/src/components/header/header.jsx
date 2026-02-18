@@ -79,8 +79,8 @@ function Header() {
             transition={{ duration: 0.5 }}
             className="flex items-center gap-2"
           >
-            <NavLink to='/' className="text-2xl font-black text-white drop-shadow-lg hover:scale-105 transition-transform duration-200 flex items-center gap-2">
-              <span className="bg-white text-purple-600 rounded-lg px-2 py-1 text-xl">📝</span>
+            <NavLink to='/' className="text-2xl font-black text-white drop-shadow-lg hover:scale-105 transition-transform duration-200 flex items-center gap-2" aria-label="Home">
+              <span className="bg-white text-purple-600 rounded-lg px-2 py-1 text-xl" aria-hidden="true">📝</span>
               {t("header.brand")}
             </NavLink>
           </motion.div>
