@@ -100,9 +100,7 @@ function UserProfile() {
     );
   }
 
-  /* ================= PROFILE ================= */
 
-  const imageUrl = previewImage || user?.profileImage || null;
 
   return (
     <section className="px-4 py-8 flex justify-center">
@@ -122,7 +120,7 @@ function UserProfile() {
                   <div className="h-full w-full rounded-full overflow-hidden bg-gray-100">
                     {imageUrl ? (
                       <img
-                        src={imageUrl}
+                        src={user?.UserProfile}
                         alt={user?.name}
                         className="h-full w-full object-cover"
                       />
