@@ -118,9 +118,9 @@ function UserProfile() {
                 {/* Profile Image */}
                 <div className="relative h-16 w-16 border-2 border-green-500 rounded-full">
                   <div className="h-full w-full rounded-full overflow-hidden bg-gray-100">
-                    {imageUrl ? (
+                    {user?.profileImage ? (
                       <img
-                        src={user?.UserProfile || null}
+                        src={user?.profileImage || null}
                         alt={user?.name}
                         className="h-full w-full object-cover"
                       />
