@@ -136,9 +136,9 @@ function TaskList({ tasks, setTasks }) {
                   onClick={() => setSelectedTask(task)}
                 >
                   <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-3 border border-black">
+                    <div className="flex items-center gap-4">
                       <button
-                      className="p-1 rounded-full mr-2 hover:bg-gray-100 transition"
+                      className="p-4 bg-gray-100 rounded-sm mr-2 hover:bg-gray-100 transition"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleToggle(task);
