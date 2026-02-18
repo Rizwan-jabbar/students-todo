@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import AddToDo from "../addToDo/addToDo";
 import TaskList from "../taskList/taskList";
@@ -7,9 +8,32 @@ import { motion } from "framer-motion";
 function DashBoard() {
   const { t } = useTranslation();
 
+  const [tasks, setTasks] = useState([]);
+  const token = localStorage.getItem("token");
+
+  const fetchTasks = async () => {
+    try {
+      const res = await fetch(
+        "https://students-todo-production.up.railway.app/api/tasks",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const data = await res.json();
+      setTasks(data.tasks || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 px-4 lg:px-12 py-8">
-      
+
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -30 }}
@@ -33,27 +57,16 @@ function DashBoard() {
         </div>
       </motion.div>
 
-      {/* Main Content */}
       <div className="max-w-6xl mx-auto space-y-8">
 
-        {/* Add Task Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="bg-white rounded-3xl shadow-lg p-6 border border-gray-100"
-        >
-          <AddToDo />
+        {/* Add Task */}
+        <motion.div className="bg-white rounded-3xl shadow-lg p-6 border border-gray-100">
+          <AddToDo onTaskAdded={fetchTasks} />
         </motion.div>
 
-        {/* Task List Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="bg-white rounded-3xl shadow-xl p-6 border border-gray-100"
-        >
-          <TaskList />
+        {/* Task List */}
+        <motion.div className="bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
+          <TaskList tasks={tasks} setTasks={setTasks} />
         </motion.div>
 
       </div>

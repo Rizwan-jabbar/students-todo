@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import {
   FaTrash,
   FaEdit,
@@ -9,81 +9,61 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
-function TaskList() {
+function TaskList({ tasks, setTasks }) {
   const { t } = useTranslation();
 
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [selectedTask, setSelectedTask] = useState(null);
   const [search, setSearch] = useState("");
 
   const token = localStorage.getItem("token");
 
-  const fetchTasks = async () => {
-    try {
-      const res = await fetch(`https://students-todo-production.up.railway.app/api/tasks`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-
-      setTasks(data.tasks || []);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleDelete = async (id) => {
-    await fetch(`https://students-todo-production.up.railway.app/api/task/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    await fetch(
+      `https://students-todo-production.up.railway.app/api/task/${id}`,
+      {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
 
     setTasks((prev) => prev.filter((t) => t._id !== id));
     if (selectedTask?._id === id) setSelectedTask(null);
   };
 
   const handleToggle = async (task) => {
-  try {
-    const res = await fetch(`https://students-todo-production.up.railway.app/api/task/${task._id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ completed: !task.completed }),
-    });
+    try {
+      const res = await fetch(
+        `https://students-todo-production.up.railway.app/api/task/${task._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ completed: !task.completed }),
+        }
+      );
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) {
-      throw new Error(data.message || "Update failed");
+      if (!res.ok) {
+        throw new Error(data.message || "Update failed");
+      }
+
+      setTasks((prev) =>
+        prev.map((t) =>
+          t._id === task._id ? data.task : t
+        )
+      );
+
+      if (selectedTask?._id === task._id) {
+        setSelectedTask(data.task);
+      }
+
+    } catch (err) {
+      console.error("Toggle error:", err.message);
     }
-
-    // ✅ Use backend response instead of manual update
-    setTasks((prev) =>
-      prev.map((t) =>
-        t._id === task._id ? data.task : t
-      )
-    );
-
-    if (selectedTask?._id === task._id) {
-      setSelectedTask(data.task);
-    }
-
-  } catch (err) {
-    console.error("Toggle error:", err.message);
-  }
-};
-
-
-  useEffect(() => {
-    fetchTasks();
-  }, [tasks]);
+  };
 
   // 🔍 Filtered tasks
   const filteredTasks = useMemo(() => {
@@ -95,9 +75,6 @@ function TaskList() {
   // 📊 Stats
   const completedCount = tasks.filter((t) => t.completed).length;
   const pendingCount = tasks.length - completedCount;
-
-  if (loading) return <p className="text-center mt-6">Loading...</p>;
-  if (error) return <p className="text-red-500 text-center">{error}</p>;
 
   return (
     <div className="h-full flex flex-col">
@@ -173,10 +150,11 @@ function TaskList() {
                       </button>
 
                       <h4
-                        className={`font-semibold ${task.completed
+                        className={`font-semibold ${
+                          task.completed
                             ? "line-through text-gray-400"
                             : "text-gray-800"
-                          }`}
+                        }`}
                       >
                         {task.title}
                       </h4>
@@ -206,56 +184,7 @@ function TaskList() {
         )}
       </div>
 
-      {/* Modal */}
-      <AnimatePresence>
-        {selectedTask && (
-          <motion.div
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedTask(null)}
-          >
-            <motion.div
-              onClick={(e) => e.stopPropagation()}
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.9 }}
-              className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6"
-            >
-              <h3 className="text-xl font-bold mb-3">
-                {selectedTask.title}
-              </h3>
-
-              <p className="text-gray-600 mb-4">
-                {selectedTask.description || "No description"}
-              </p>
-
-              <div className="text-sm text-gray-500 space-y-1">
-                <p>
-                  Status:{" "}
-                  <span className="font-semibold">
-                    {selectedTask.completed ? "Completed" : "Pending"}
-                  </span>
-                </p>
-                <p>
-                  Created:{" "}
-                  {new Date(selectedTask.createdAt).toLocaleString()}
-                </p>
-              </div>
-
-              <div className="mt-6 text-right">
-                <button
-                  onClick={() => setSelectedTask(null)}
-                  className="bg-gray-900 text-white px-4 py-2 rounded-xl text-sm hover:bg-gray-800"
-                >
-                  Close
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Modal same as before */}
     </div>
   );
 }

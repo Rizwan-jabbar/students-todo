@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FaPlus, FaTrash, FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
+import {
+  FaPlus,
+  FaTrash,
+  FaCheckCircle,
+  FaExclamationCircle,
+} from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
-
-function AddToDo() {
+function AddToDo({ onTaskAdded }) {
   const { t } = useTranslation();
 
   const [task, setTask] = useState("");
@@ -34,26 +38,31 @@ function AddToDo() {
     try {
       setLoading(true);
 
-      const res = await fetch(`https://students-todo-production.up.railway.app/api/task`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ title: task, description }),
-      });
+      const res = await fetch(
+        `https://students-todo-production.up.railway.app/api/task`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ title: task, description }),
+        }
+      );
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
 
       setSuccess(t("add_todo.messages.success_title"));
 
-      // Auto clear after success
-      setTimeout(() => {
-        setTask("");
-        setDescription("");
-        setSuccess("");
-      }, 1500);
+      // 🔥 IMPORTANT: Refresh task list
+      if (onTaskAdded) {
+        onTaskAdded();
+      }
+
+      // Clear form
+      setTask("");
+      setDescription("");
 
     } catch (err) {
       setError(err.message || t("add_todo.messages.server_error"));
@@ -176,6 +185,7 @@ function AddToDo() {
               </span>
             </motion.button>
           </div>
+
         </form>
       </motion.div>
     </div>
