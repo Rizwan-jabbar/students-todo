@@ -135,15 +135,14 @@ function TaskList({ tasks, setTasks }) {
                   className="bg-white border rounded-2xl p-4 shadow-sm hover:shadow-md transition cursor-pointer"
                   onClick={() => setSelectedTask(task)}
                 >
-                  <div className="flex justify-between items-center gap-2">
-                    <div
-                    onClick={(e) => {
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-3 border border-black">
+                      <button
+                      className="p-1 rounded-full mr-2 hover:bg-gray-100 transition"
+                        onClick={(e) => {
                           e.stopPropagation();
                           handleToggle(task);
                         }}
-                     className="flex items-center gap-3 bg-gray-50 ">
-                      <button
-                        
                       >
                         {task.completed ? (
                           <FaCheckCircle className="text-green-500" />
