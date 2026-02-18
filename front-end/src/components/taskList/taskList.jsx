@@ -138,25 +138,26 @@ function TaskList({ tasks, setTasks }) {
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-4">
                       <button
-                      className="p-4 bg-gray-100 rounded-sm mr-2 hover:bg-gray-100 transition"
+                        type="button"
+                        className="p-2 bg-gray-100 rounded-md hover:bg-gray-200 transition flex items-center justify-center"
                         onClick={(e) => {
-                          e.stopPropagation();
-                          handleToggle(task);
+                          e.stopPropagation();   // ❗ parent onClick ko stop kare
+                          handleToggle(task);    // ✅ toggle function run kare
                         }}
                       >
                         {task.completed ? (
-                          <FaCheckCircle className="text-green-500" />
+                          <FaCheckCircle className="text-green-500 text-lg" />
                         ) : (
-                          <FaRegCircle className="text-gray-400" />
+                          <FaRegCircle className="text-gray-400 text-lg" />
                         )}
                       </button>
 
+
                       <h4
-                        className={`font-semibold ${
-                          task.completed
+                        className={`font-semibold ${task.completed
                             ? "line-through text-gray-400"
                             : "text-gray-800"
-                        }`}
+                          }`}
                       >
                         {task.title}
                       </h4>
