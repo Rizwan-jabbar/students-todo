@@ -120,7 +120,7 @@ function UserProfile() {
                   <div className="h-full w-full rounded-full overflow-hidden bg-gray-100">
                     {imageUrl ? (
                       <img
-                        src={user?.UserProfile}
+                        src={user?.UserProfile || null}
                         alt={user?.name}
                         className="h-full w-full object-cover"
                       />

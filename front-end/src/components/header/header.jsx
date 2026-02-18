@@ -134,7 +134,7 @@ function Header() {
                 >
                   {user.profileImage ? (
                     <img
-                      src={user.profileImage} // <-- Cloudinary secure_url directly
+                      src={user.profileImage || null} // <-- Cloudinary secure_url directly
                       alt={user.name}
                       className="h-full w-full object-cover"
                     />
