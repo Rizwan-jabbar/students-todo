@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaGlobe, FaChevronDown } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
-import NavLink from "react-router-dom"
+import {NavLink} from "react-router-dom"
 
 function Login() {
   const { t, i18n } = useTranslation();
@@ -186,9 +186,9 @@ function Login() {
                 )}
               </button>
 
-              <Navigate to="/register" className="block text-center text-sm mt-2 text-green-600 hover:underline">
+              <NavLink to="/register" className="block text-center text-sm mt-2 text-green-600 hover:underline">
                 {t("login.no_account")}
-              </Navigate>
+              </NavLink>
 
               <p className="text-center text-xs text-gray-400">
                 {t("login.terms")}
