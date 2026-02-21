@@ -185,6 +185,10 @@ function Login() {
                 )}
               </button>
 
+              <Navigate to="/register" className="block text-center text-sm mt-2 text-green-600 hover:underline">
+                {t("login.no_account")}
+              </Navigate>
+
               <p className="text-center text-xs text-gray-400">
                 {t("login.terms")}
               </p>
