@@ -87,17 +87,17 @@ function TaskList({ tasks, setTasks }) {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-gray-100 rounded-2xl p-4 text-center">
-          <p className="text-sm text-gray-500">Total</p>
+          <p className="sm:text-[12px] lag:text-sm text-gray-500">Total</p>
           <p className="text-xl font-bold">{tasks.length}</p>
         </div>
         <div className="bg-green-50 rounded-2xl p-4 text-center">
-          <p className="text-sm text-green-600">Completed</p>
+          <p className="sm:text-[12px] lag:text-sm text-green-600">Completed</p>
           <p className="text-xl font-bold text-green-700">
             {completedCount}
           </p>
         </div>
         <div className="bg-yellow-50 rounded-2xl p-4 text-center">
-          <p className="text-sm text-yellow-600">Pending</p>
+          <p className="sm:text-[12px] lag:text-sm text-yellow-600">Pending</p>
           <p className="text-xl font-bold text-yellow-700">
             {pendingCount}
           </p>
